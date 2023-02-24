@@ -13,7 +13,6 @@ from PIL import Image,ImageDraw,ImageFont
 
 
 class LCD():
-    
     def __init__(self):
         # Raspberry Pi pin configuration:
         RST = 27
