@@ -92,7 +92,7 @@ class DisplayThread(Thread):
         self.status = 1
             
     def run(self):
-        path = '../Happy 13FTS_Per Secend'
+        path = '../emoji/Happy 13FTS_Per Secend'
         fileName=os.listdir(path)
         file_i = 0
         while True:
@@ -104,12 +104,12 @@ class DisplayThread(Thread):
                 file_i = 0
             self.timer += 1
             if self.status == 1 and np.mean(lux_history) < 50:
-                path = '../Cry 16FTS_Per Second'
+                path = '../emoji/Cry 16FTS_Per Second'
                 fileName = os.listdir(path)
                 file_i = 0
                 self.status = 2
             elif self.status == 2 and np.mean(lux_history) > 50:
-                path = '../Happy 13FTS_Per Secend'
+                path = '../emoji/Happy 13FTS_Per Secend'
                 fileName=os.listdir(path)
                 file_i = 0
                 self.status = 1
