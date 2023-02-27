@@ -12,6 +12,7 @@ from threading import Thread, Lock
 from LuxSensor import readLight
 from VibraionSensor import vibrationSensor
 from DisplayControl import LCD
+from motorcontrol import MotorController
 sys.path.append("..")
 
 lux_history = []
@@ -60,6 +61,18 @@ class VibrationReader(Thread):
             vibration_lock.release()
             time.sleep(self.reading_delay)
             
+class MotorControlThread(Thread):
+    def __init__(self):
+        super().__init__()
+        self.controller = MotorController()
+    
+    def run(self):
+        while True:
+            time.sleep(3)
+            self.controller.keep_vibrating(0.2)
+            time.sleep(0.2)
+            self.controller.keep_vibrating(0.2)
+            
 
 if __name__=='__main__':
     # lcd=LCD(fps=60)
@@ -69,6 +82,8 @@ if __name__=='__main__':
     lux_reader.start()
     vibration_reader = VibrationReader(5)
     vibration_reader.start()
+    motor_thread = MotorControlThread()
+    motor_thread.start()
     while True:
         print("Lux history read %.4f" % np.mean(lux_history))
         print("Vibration history read %s" % np.array(vibration_history))
