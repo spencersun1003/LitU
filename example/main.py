@@ -13,13 +13,21 @@ from PIL import Image,ImageDraw,ImageFont
 
 
 class LCD():
-    def __init__(self):
+    def __init__(self, fps):
         # Raspberry Pi pin configuration:
         RST = 27
         DC = 25
         BL = 21
         bus = 0 
         device = 0
+        self.fps = fps
+        self.delay = 1 / fps
+        self.timer = 0
+        self.arcmax = 135
+        self.arcspeed = 270 # arc per second
+        self.imagefps = 60
+        self.timeperimage = self.fps / self.imagefps
+        
         logging.basicConfig(level=logging.DEBUG)
         try:
             # display with hardware SPI:
@@ -38,26 +46,40 @@ class LCD():
             exit()
             
             
-    def show_img(self,path='../pic/LCD_1inch28_1.jpg',delay=0.05):
-        image = Image.open(path)	
-        im_r=image.rotate(180)
-        self.disp.ShowImage(im_r)
-        time.sleep(delay)
+    def show_img(self,path='../pic/LCD_1inch28_1.jpg'):
+        face = Image.open(path)
+        image = Image.new("RGB", (self.disp.width, self.disp.height), "BLACK")	
+        face_r=face.rotate(180)
+        face_r = face_r.resize((120,120))
+        image.paste(face_r, (60,60))
+        # Create blank image for drawing.
+        draw = ImageDraw.Draw(image)
+
+        #logging.info("draw point")
+        # draw.rectangle((20,20,220,220), fill = "blue")
+        logging.info("draw circle")
+        draw.arc((10,10,230,230),0, min(self.arcmax, self.delay * self.timer * self.arcspeed), fill =(0,0,255),width=5)
+        self.disp.ShowImage(image)
+        time.sleep(self.delay)
+        self.timer += 1
     def end(self):
         self.disp.module_exit()
         logging.info("quit:")
     def show_folder(self,path):
         fileName=os.listdir(path)
-        
+        file_i = 0
         while True:
-            for file in fileName:
-                self.show_img(os.path.join(path,file))
+            self.show_img(os.path.join(path,fileName[file_i]))
+            if not self.timer % self.timeperimage:
+                file_i += 1
+            if file_i == len(fileName):
+                file_i = 0
 
 
 if __name__=='__main__':
     
 
-    lcd=LCD()
+    lcd=LCD(fps=60)
     lcd.show_folder('../TestAni')
    #  while True:
    #      lcd.show_img()
