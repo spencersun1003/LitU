@@ -8,6 +8,8 @@ import logging
 import multiprocessing
 import numpy as np
 
+import RPi.GPIO as GPIO
+GPIO.setmode(GPIO.BCM);
 from threading import Thread, Lock
 from LuxSensor import readLight
 from VibraionSensor import vibrationSensor
@@ -74,9 +76,26 @@ class MotorControlThread(Thread):
             self.controller.keep_vibrating(0.2)
             
 
+class DisplayThread(Thread):
+    def __init__(self):
+        super().__init__()
+        self.controller = LCD(fps=30)
+    
+    def run(self):
+        self.show_folder('../TestAni')
+            
+    def show_folder(self,path):
+        fileName=os.listdir(path)
+        file_i = 0
+        while True:
+            self.controller.show_img(os.path.join(path,fileName[file_i]))
+            if not self.controller.timer % self.controller.timeperimage:
+                file_i += 1
+            if file_i == len(fileName):
+                file_i = 0
+
+
 if __name__=='__main__':
-    # lcd=LCD(fps=60)
-    # lcd.show_folder('../TestAni')
     procs = []
     lux_reader = LuxReader(5)
     lux_reader.start()
@@ -84,6 +103,8 @@ if __name__=='__main__':
     vibration_reader.start()
     motor_thread = MotorControlThread()
     motor_thread.start()
+    display_thread = DisplayThread()
+    display_thread.start()
     while True:
         print("Lux history read %.4f" % np.mean(lux_history))
         print("Vibration history read %s" % np.array(vibration_history))

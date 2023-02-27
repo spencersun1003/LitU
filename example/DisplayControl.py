@@ -12,9 +12,9 @@ from PIL import Image,ImageDraw,ImageFont
 class LCD():
     def __init__(self, fps):
         # Raspberry Pi pin configuration:
-        RST = 27
-        DC = 25
-        BL = 21
+        RST = 6
+        DC = 5
+        BL = 13
         bus = 0 
         device = 0
         self.fps = fps
@@ -29,8 +29,8 @@ class LCD():
         try:
             # display with hardware SPI:
             ''' Warning!!!Don't  creation of multiple displayer objects!!! '''
-            #disp = LCD_1inch28.LCD_1inch28(spi=SPI.SpiDev(bus, device),spi_freq=10000000,rst=RST,dc=DC,bl=BL)
-            self.disp = LCD_1inch28.LCD_1inch28()
+            self.disp = LCD_1inch28.LCD_1inch28(spi=SPI.SpiDev(bus, device),spi_freq=10000000,rst=RST,dc=DC,bl=BL)
+            #self.disp = LCD_1inch28.LCD_1inch28()
             # Initialize library.
             self.disp.Init()
             # Clear display.
@@ -52,9 +52,9 @@ class LCD():
         # Create blank image for drawing.
         draw = ImageDraw.Draw(image)
 
-        #logging.info("draw point")
+        # logging.info("draw point")
         # draw.rectangle((20,20,220,220), fill = "blue")
-        logging.info("draw circle")
+        # logging.info("draw circle")
         draw.arc((10,10,230,230),0, min(self.arcmax, self.delay * self.timer * self.arcspeed), fill =(0,0,255),width=5)
         self.disp.ShowImage(image)
         time.sleep(self.delay)
@@ -62,12 +62,3 @@ class LCD():
     def end(self):
         self.disp.module_exit()
         logging.info("quit:")
-    def show_folder(self,path):
-        fileName=os.listdir(path)
-        file_i = 0
-        while True:
-            self.show_img(os.path.join(path,fileName[file_i]))
-            if not self.timer % self.timeperimage:
-                file_i += 1
-            if file_i == len(fileName):
-                file_i = 0
