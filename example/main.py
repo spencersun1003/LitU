@@ -80,6 +80,9 @@ class DisplayThread(Thread):
     def __init__(self):
         super().__init__()
         self.controller = LCD(fps=30)
+        self.timer = 0
+        self.imagefps = 30
+        self.timeperimage = self.controller.fps / self.imagefps
     
     def run(self):
         self.show_folder('../TestAni')
@@ -88,11 +91,13 @@ class DisplayThread(Thread):
         fileName=os.listdir(path)
         file_i = 0
         while True:
-            self.controller.show_img(os.path.join(path,fileName[file_i]))
-            if not self.controller.timer % self.controller.timeperimage:
+            self.controller.show_img(os.path.join(path,fileName[file_i]), np.mean(lux_history))
+            if self.timer > self.timeperimage:
                 file_i += 1
+                self.timer = 0
             if file_i == len(fileName):
                 file_i = 0
+            self.timer += 1
 
 
 if __name__=='__main__':
