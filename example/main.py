@@ -70,10 +70,16 @@ class MotorControlThread(Thread):
     
     def run(self):
         while True:
-            time.sleep(3)
-            self.controller.keep_vibrating(0.2)
-            time.sleep(0.2)
-            self.controller.keep_vibrating(0.2)
+            change_cnt = 0
+            for i in range(len(vibration_history) - 1):
+                if vibration_history[i] == 1 and vibration_history[i+1] == 0:
+                    change_cnt += 1
+                if change_cnt == 5:
+                    break
+            if change_cnt == 2:
+                self.controller.keep_vibrating(0.2)
+                time.sleep(0.2)
+                self.controller.keep_vibrating(0.2)
             
 
 class DisplayThread(Thread):
@@ -83,11 +89,10 @@ class DisplayThread(Thread):
         self.timer = 0
         self.imagefps = 30
         self.timeperimage = self.controller.fps / self.imagefps
-    
-    def run(self):
-        self.show_folder('../TestAni')
+        self.status = 1
             
-    def show_folder(self,path):
+    def run(self):
+        path = '../Happy 13FTS_Per Secend'
         fileName=os.listdir(path)
         file_i = 0
         while True:
@@ -98,13 +103,23 @@ class DisplayThread(Thread):
             if file_i == len(fileName):
                 file_i = 0
             self.timer += 1
+            if self.status == 1 and np.mean(lux_history) < 50:
+                path = '../Cry 16FTS_Per Second'
+                fileName = os.listdir(path)
+                file_i = 0
+                self.status = 2
+            elif self.status == 2 and np.mean(lux_history) > 50:
+                path = '../Happy 13FTS_Per Secend'
+                fileName=os.listdir(path)
+                file_i = 0
+                self.status = 1
 
 
 if __name__=='__main__':
     procs = []
     lux_reader = LuxReader(5)
     lux_reader.start()
-    vibration_reader = VibrationReader(5)
+    vibration_reader = VibrationReader(freq=100,limit=25)
     vibration_reader.start()
     motor_thread = MotorControlThread()
     motor_thread.start()

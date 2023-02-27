@@ -2,10 +2,12 @@ import os
 import sys 
 import time
 import logging
+logging.getLogger("PIL.TiffImagePlugin").setLevel(logging.CRITICAL+1)
 import spidev as SPI
 sys.path.append("..")
 from lib import LCD_1inch28
-from PIL import Image,ImageDraw,ImageFont
+from PIL import Image,ImageDraw,ImageFont, TiffImagePlugin
+TiffImagePlugin.DEBUG=False
 Font3 = ImageFont.truetype("../Font/Font02.ttf",32)
 
 
