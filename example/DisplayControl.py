@@ -6,7 +6,7 @@ import spidev as SPI
 sys.path.append("..")
 from lib import LCD_1inch28
 from PIL import Image,ImageDraw,ImageFont
-
+Font3 = ImageFont.truetype("../Font/Font02.ttf",32)
 
 
 class LCD():
@@ -22,8 +22,6 @@ class LCD():
         self.timer = 0
         self.arcmax = 135
         self.arcspeed = 270 # arc per second
-        self.imagefps = 60
-        self.timeperimage = self.fps / self.imagefps
         
         logging.basicConfig(level=logging.DEBUG)
         try:
@@ -43,15 +41,16 @@ class LCD():
             exit()
             
             
-    def show_img(self,path='../pic/LCD_1inch28_1.jpg'):
+    def show_img(self,path='../pic/LCD_1inch28_1.jpg', lux: float = 0):
         face = Image.open(path)
         image = Image.new("RGB", (self.disp.width, self.disp.height), "BLACK")	
-        face_r=face.rotate(180)
-        face_r = face_r.resize((120,120))
+        face_r = face.resize((120,120))
         image.paste(face_r, (60,60))
         # Create blank image for drawing.
         draw = ImageDraw.Draw(image)
-
+        draw.text((74, 150),"%.2f" % lux, fill = "WHITE",font=Font3)
+        image = image.rotate(180)
+        draw = ImageDraw.Draw(image)
         # logging.info("draw point")
         # draw.rectangle((20,20,220,220), fill = "blue")
         # logging.info("draw circle")
