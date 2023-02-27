@@ -2,7 +2,7 @@ import time
 import RPi.GPIO as GPIO
             
 class MotorController():
-    def __init__(self, io_pin: int = 37):
+    def __init__(self, io_pin: int = 26):
         self.pin = io_pin
         GPIO.setup(self.pin, GPIO.OUT)
         

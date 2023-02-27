@@ -1,9 +1,8 @@
 import RPi.GPIO as GPIO
 
 class vibrationSensor():
-	def __init__(self,pinD=15):
+	def __init__(self,pinD=22):
 		#self.pinA=pinA
-		GPIO.setmode(GPIO.BOARD);
 		self.pinD=pinD
 		GPIO.setup(self.pinD, GPIO.IN)
 		
