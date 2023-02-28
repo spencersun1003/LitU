@@ -10,6 +10,13 @@ from PIL import Image,ImageDraw,ImageFont, TiffImagePlugin
 TiffImagePlugin.DEBUG=False
 Font3 = ImageFont.truetype("../Font/Font02.ttf",32)
 
+# Reading the images into the memory
+HAPPY_PATH = '../emoji/Happy 13FTS_Per Secend'
+CRY_PATH = '../emoji/Cry 16FTS_Per Second'
+LOADED_IMAGES = {
+    'happy': [Image.open(os.path.join(HAPPY_PATH, f)) for f in os.listdir(HAPPY_PATH)],
+    'cry': [Image.open(os.path.join(CRY_PATH, f)) for f in os.listdir(CRY_PATH)]
+}
 
 class LCD():
     def __init__(self, fps):
@@ -43,8 +50,8 @@ class LCD():
             exit()
             
             
-    def show_img(self,path='../pic/LCD_1inch28_1.jpg', lux: float = 0):
-        face = Image.open(path)
+    def show_img(self, mode='happy', index=0, lux: float = 0):
+        face = LOADED_IMAGES[mode][index]
         image = Image.new("RGB", (self.disp.width, self.disp.height), "BLACK")	
         face_r = face.resize((120,120))
         image.paste(face_r, (60,60))

@@ -13,7 +13,7 @@ GPIO.setmode(GPIO.BCM);
 from threading import Thread, Lock
 from LuxSensor import readLight
 from VibraionSensor import vibrationSensor
-from DisplayControl import LCD
+from DisplayControl import LCD, LOADED_IMAGES
 from motorcontrol import MotorController
 sys.path.append("..")
 
@@ -92,25 +92,22 @@ class DisplayThread(Thread):
         self.status = 1
             
     def run(self):
-        path = '../emoji/Happy 13FTS_Per Secend'
-        fileName=os.listdir(path)
+        mode = 'happy'
         file_i = 0
         while True:
-            self.controller.show_img(os.path.join(path,fileName[file_i]), np.mean(lux_history))
+            self.controller.show_img(mode, file_i)
             if self.timer > self.timeperimage:
                 file_i += 1
                 self.timer = 0
-            if file_i == len(fileName):
+            if file_i == len(LOADED_IMAGES[mode]):
                 file_i = 0
             self.timer += 1
             if self.status == 1 and np.mean(lux_history) < 50:
-                path = '../emoji/Cry 16FTS_Per Second'
-                fileName = os.listdir(path)
+                mode = 'cry'
                 file_i = 0
                 self.status = 2
             elif self.status == 2 and np.mean(lux_history) > 50:
-                path = '../emoji/Happy 13FTS_Per Secend'
-                fileName=os.listdir(path)
+                mode = 'happy'
                 file_i = 0
                 self.status = 1
 
