@@ -19,6 +19,7 @@ normalize = {
         'gz': 6.819778407387476,
     }
 }
+parameters = pickle.load(open('../lstm_model.pkl', 'rb'))
 
 def sigmoid(x):
     return 1 / (1 + np.exp(-x))
@@ -90,7 +91,10 @@ def lstm_model_forward(x, parameters):
     return output
 
 
-def inference(x, parameters):
+def inference(x):
+    if isinstance(x, list):
+        ax, ay, az, gx, gy, gz = np.array([d[0][0] for d in x]), np.array([d[0][1] for d in x]), np.array([d[0][2] for d in x]), np.array([d[1][0] for d in x]), np.array([d[1][1] for d in x]), np.array([d[1][2] for d in x])
+        x = np.stack((ax, ay, az, gx, gy, gz), axis=1)
     x[:, 0] = (x[:, 0] - normalize['mean']['ax']) / normalize['std']['ax']
     x[:, 1] = (x[:, 1] - normalize['mean']['ay']) / normalize['std']['ay']
     x[:, 2] = (x[:, 2] - normalize['mean']['az']) / normalize['std']['az']
@@ -99,10 +103,10 @@ def inference(x, parameters):
     x[:, 5] = (x[:, 5] - normalize['mean']['gz']) / normalize['std']['gz']
     x = np.expand_dims(x, axis=0)
     np_y = lstm_model_forward(x, parameters)
-    return np_y > 0.5
+    return (np_y > 0.5).item()
 
 if __name__ == '__main__':
-    parameters = pickle.load(open('../lstm_model.pkl', 'rb'))
     for i in range(10):
-        x = np.rand(1, 20, 6)
-        prediction = inference(x, parameters)
+        x = np.random.randn(20, 6)
+        prediction = inference(x)
+        print(prediction.item())
