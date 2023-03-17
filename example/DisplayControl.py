@@ -66,6 +66,7 @@ class LCD():
         # draw.rectangle((20,20,220,220), fill = "blue")
         # logging.info("draw circle")
         draw.arc((10,10,230,230),0, min(self.arcmax, self.delay * self.timer * self.arcspeed), fill =(0,0,255),width=5)
+        image = image.rotate(180)
         self.disp.ShowImage(image)
         time.sleep(self.delay)
         self.timer += 1
