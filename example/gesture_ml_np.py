@@ -103,7 +103,7 @@ def inference(x):
     x[:, 5] = (x[:, 5] - normalize['mean']['gz']) / normalize['std']['gz']
     x = np.expand_dims(x, axis=0)
     np_y = lstm_model_forward(x, parameters)
-    return (np_y > 0.5).item()
+    return (np_y > 0.5).item(), np_y.item()
 
 if __name__ == '__main__':
     for i in range(10):

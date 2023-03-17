@@ -50,7 +50,7 @@ class LCD():
             exit()
             
             
-    def show_img(self, mode='happy', index=0, lux: float = 0):
+    def show_img(self, mode='happy', index=0, lux: float = 0, patting_score: float = 0):
         face = LOADED_IMAGES[mode][index]
         image = Image.new("RGB", (self.disp.width, self.disp.height), "BLACK")	
         face_r = face.resize((120,120))
@@ -58,6 +58,7 @@ class LCD():
         # Create blank image for drawing.
         draw = ImageDraw.Draw(image)
         draw.text((74, 150),"%.2f" % lux, fill = "WHITE",font=Font3)
+        draw.text((74, 180),"%.2f" % patting_score, fill = "WHITE",font=Font3)
         image = image.rotate(180)
         draw = ImageDraw.Draw(image)
         # logging.info("draw point")
