@@ -1,6 +1,25 @@
 import pickle
 import numpy as np
 
+normalize = {
+    'mean': {
+        'ax': -0.04649547031947544,
+        'ay': -0.7898887034824916,
+        'az': -0.1780448477608817,
+        'gx': -0.36303026172300984,
+        'gy': -0.03285850599781901,
+        'gz': -0.05809160305343511
+    },
+    'std': {
+        'ax': 0.2560270511848388,
+        'ay': 0.4629416712847358,
+        'az': 0.3843875035875543,
+        'gx': 6.684420876973939,
+        'gy': 19.601419629629802,
+        'gz': 6.819778407387476,
+    }
+}
+
 def sigmoid(x):
     return 1 / (1 + np.exp(-x))
 
@@ -72,7 +91,14 @@ def lstm_model_forward(x, parameters):
 
 
 def inference(x, parameters):
-    np_y = lstm_model_forward(x.detach().numpy(), parameters)
+    x[:, 0] = (x[:, 0] - normalize['mean']['ax']) / normalize['std']['ax']
+    x[:, 1] = (x[:, 1] - normalize['mean']['ay']) / normalize['std']['ay']
+    x[:, 2] = (x[:, 2] - normalize['mean']['az']) / normalize['std']['az']
+    x[:, 3] = (x[:, 3] - normalize['mean']['gx']) / normalize['std']['gx']
+    x[:, 4] = (x[:, 4] - normalize['mean']['gy']) / normalize['std']['gy']
+    x[:, 5] = (x[:, 5] - normalize['mean']['gz']) / normalize['std']['gz']
+    x = np.expand_dims(x, axis=0)
+    np_y = lstm_model_forward(x, parameters)
     return np_y > 0.5
 
 if __name__ == '__main__':
