@@ -48,11 +48,11 @@ class IMUsensor():
 		#Accelero and Gyro value are 16-bit
 		high = self.bus.read_byte_data(self.Device_Address, addr)
 		low = self.bus.read_byte_data(self.Device_Address, addr+1)
-    
-        #concatenate higher and lower value
+
+		#concatenate higher and lower value
 		value = ((high << 8) | low)
-        
-        #to get signed value from mpu6050
+
+		#to get signed value from mpu6050
 		if(value > 32768):
 			value = value - 65536
 		return value
@@ -77,6 +77,7 @@ class IMUsensor():
 		Gx = gyro_x/131.0
 		Gy = gyro_y/131.0
 		Gz = gyro_z/131.0
+
 		
 		return (Ax,Ay,Az),(Gx,Gy,Gz)
 
