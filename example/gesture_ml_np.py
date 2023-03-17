@@ -1,7 +1,5 @@
-import torch
+import pickle
 import numpy as np
-from gesture_ml import GestureLSTMModule
-
 
 def sigmoid(x):
     return 1 / (1 + np.exp(-x))
@@ -41,20 +39,20 @@ def lstm_forward(x, h, c, W_ih, W_hh, b_ih, b_hh):
 
 
 # Define the function for the forward pass of the LSTM model
-def lstm_model_forward(x, model):
+def lstm_model_forward(x, parameters):
     # x: input sequence of shape (batch_size, seq_len, input_size)
     # model: trained PyTorch LSTM model
     # Get the parameters from the trained model
-    W_ih_0 = model.lstm.weight_ih_l0.detach().numpy()
-    W_ih_1 = model.lstm.weight_ih_l1.detach().numpy()
-    W_hh_0 = model.lstm.weight_hh_l0.detach().numpy()
-    W_hh_1 = model.lstm.weight_hh_l1.detach().numpy()
-    b_ih_0 = model.lstm.bias_ih_l0.detach().numpy()
-    b_ih_1 = model.lstm.bias_ih_l1.detach().numpy()
-    b_hh_0 = model.lstm.bias_hh_l0.detach().numpy()
-    b_hh_1 = model.lstm.bias_hh_l1.detach().numpy()
-    W_fc = model.fc.weight.detach().numpy()
-    b_fc = model.fc.bias.detach().numpy()
+    W_ih_0 = parameters['lstm.weight_ih_l0']
+    W_ih_1 = parameters['lstm.weight_ih_l1']
+    W_hh_0 = parameters['lstm.weight_hh_l0']
+    W_hh_1 = parameters['lstm.weight_hh_l1']
+    b_ih_0 = parameters['lstm.bias_ih_l0']
+    b_ih_1 = parameters['lstm.bias_ih_l1']
+    b_hh_0 = parameters['lstm.bias_hh_l0']
+    b_hh_1 = parameters['lstm.bias_hh_l1']
+    W_fc = parameters['fc.weight']
+    b_fc = parameters['fc.bias']
     # Initialize the hidden and cell states
     num_layers = 2
     batch_size = x.shape[0]
@@ -73,11 +71,12 @@ def lstm_model_forward(x, model):
     return output
 
 
+def inference(x, parameters):
+    np_y = lstm_model_forward(x.detach().numpy(), parameters)
+    return np_y > 0.5
+
 if __name__ == '__main__':
-    parameters = torch.load('../lstm_model.pt')
-    model = GestureLSTMModule()
-    model.load_state_dict(parameters)
-    x = torch.randn(1, 20, 6)
-    y = model(x)
-    np_y = lstm_model_forward(x.detach().numpy(), model)
-    print(y.item() - np_y.item())
+    parameters = pickle.load(open('../lstm_model.pkl', 'rb'))
+    for i in range(10):
+        x = np.rand(1, 20, 6)
+        prediction = inference(x, parameters)
