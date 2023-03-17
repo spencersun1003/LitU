@@ -9,12 +9,14 @@ import multiprocessing
 import numpy as np
 
 import RPi.GPIO as GPIO
-GPIO.setmode(GPIO.BCM);
+GPIO.setmode(GPIO.BCM)
 from threading import Thread, Lock
 from LuxSensor import readLight
 from VibraionSensor import vibrationSensor
 from DisplayControl import LCD, LOADED_IMAGES
 from motorcontrol import MotorController
+from IMU import IMUsensor
+from gesture_ml_np import inference
 sys.path.append("..")
 
 lux_history = []
@@ -64,19 +66,17 @@ class VibrationReader(Thread):
             time.sleep(self.reading_delay)
             
 class MotorControlThread(Thread):
-    def __init__(self):
+    def __init__(self, vibration_length):
         super().__init__()
         self.controller = MotorController()
-    
+        self.vibration_length = vibration_length
+        
     def run(self):
         while True:
-            change_cnt = 0
-            for i in range(len(vibration_history) - 1):
-                if vibration_history[i] == 1 and vibration_history[i+1] == 0:
-                    change_cnt += 1
-                if change_cnt == 5:
-                    break
-            if change_cnt == 2:
+            if len(vibration_history) < self.vibration_length:
+                time.sleep(2)
+                continue
+            elif inference(vibration_history):
                 self.controller.keep_vibrating(0.2)
                 time.sleep(0.2)
                 self.controller.keep_vibrating(0.2)
@@ -112,13 +112,35 @@ class DisplayThread(Thread):
                 self.status = 1
 
 
+class IMUThread(Thread):
+    def __init__(self, sample_rate, time_window):
+        super().__init__()
+        self.imu = IMUsensor()
+        self.sample_rate = sample_rate
+        self.time_window = time_window
+        self.data_max_len = int(sample_rate * time_window)
+        
+    def run(self):
+        while True:
+            frame = self.imu.read_value()
+            vibration_lock.acquire()
+            if len(vibration_history) < self.data_max_len:
+                vibration_history.append(frame)
+            else:
+                vibration_history = vibration_history[1:] + [frame]
+            vibration_lock.release()
+            time.sleep(1 / self.sample_rate)
+
+
 if __name__=='__main__':
     procs = []
     lux_reader = LuxReader(5)
     lux_reader.start()
-    vibration_reader = VibrationReader(freq=100,limit=25)
-    vibration_reader.start()
-    motor_thread = MotorControlThread()
+    # vibration_reader = VibrationReader(freq=100,limit=25)
+    # vibration_reader.start()
+    imu_reader = IMUThread(sample_rate=10, time_window=2)
+    imu_reader.start()
+    motor_thread = MotorControlThread(vibration_length=20)
     motor_thread.start()
     display_thread = DisplayThread()
     display_thread.start()
