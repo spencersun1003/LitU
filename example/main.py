@@ -73,7 +73,7 @@ class MotorControlThread(Thread):
         self.vibration_length = vibration_length
         
     def run(self):
-        global patting_score
+        global patting_score, vibration_history
         while True:
             if len(vibration_history) < self.vibration_length:
                 time.sleep(2)
@@ -126,6 +126,7 @@ class IMUThread(Thread):
         self.data_max_len = int(sample_rate * time_window)
         
     def run(self):
+        global vibration_history
         while True:
             frame = self.imu.read_value()
             vibration_lock.acquire()
