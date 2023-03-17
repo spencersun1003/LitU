@@ -23,7 +23,6 @@ lux_history = []
 lux_lock = Lock()
 vibration_history = []
 vibration_lock = Lock()
-patting_score = 0
 
 class LuxReader(Thread):
     def __init__(self, freq: float, limit: int = 10):
@@ -80,7 +79,7 @@ class MotorControlThread(Thread):
                 continue
             else:
                 hit, score = inference(vibration_history)
-                patting_score = score
+                print("Patting prediction score:", score)
                 if hit:
                     self.controller.keep_vibrating(0.2)
                     time.sleep(0.2)
@@ -100,7 +99,7 @@ class DisplayThread(Thread):
         mode = 'happy'
         file_i = 0
         while True:
-            self.controller.show_img(mode, file_i, lux=np.mean(lux_history), patting_score=patting_score)
+            self.controller.show_img(mode, file_i, lux=np.mean(lux_history))
             if self.timer > self.timeperimage:
                 file_i += 1
                 self.timer = 0
@@ -152,7 +151,7 @@ if __name__=='__main__':
     display_thread.start()
     while True:
         print("Lux history read %.4f" % np.mean(lux_history))
-        print("Vibration history read %s" % np.array(vibration_history))
+        # print("Vibration history read %s" % np.array(vibration_history))
         time.sleep(1)
         
 
