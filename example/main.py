@@ -17,6 +17,7 @@ from DisplayControl import LCD, LOADED_IMAGES
 from motorcontrol import MotorController
 from IMU import IMUsensor
 from gesture_ml_np import inference
+from meross import control
 sys.path.append("..")
 
 lux_history = []
@@ -84,6 +85,7 @@ class MotorControlThread(Thread):
                     self.controller.keep_vibrating(0.2)
                     time.sleep(0.2)
                     self.controller.keep_vibrating(0.2)
+                    control()
             
 
 class DisplayThread(Thread):

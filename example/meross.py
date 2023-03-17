@@ -11,7 +11,7 @@ PASSWORD = "Zbw66714321"
 
 RGB = 255, 247, 199
 
-async def main(command='on', luminance=50):
+async def main(luminance=50):
     # Setup the HTTP client API from user-password
     http_api_client = await MerossHttpClient.async_from_user_password(email=EMAIL, password=PASSWORD)
 
@@ -41,18 +41,17 @@ async def main(command='on', luminance=50):
             current_color = dev.get_rgb_color()
             print(f"Currently, device {dev.name} is set to color (RGB) = {current_color}")
             # Randomly chose a new color
-            if command == 'on':
+            if not dev.get_light_is_on():
                 print(f"Chosen random color (R,G,B): {RGB}")
                 await dev.async_set_light_color(rgb=RGB, luminance=luminance)
             else:
                 await dev.async_set_light_color(onoff=False)
-            print("Color changed!")
+                print("Light is off")
 
     # Close the manager and logout from http_api
     manager.close()
     await http_api_client.async_logout()
 
-def control(command='on', luminance=50):
+def control(luminance=50):
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(main(command=command, luminance=luminance))
-    loop.stop()
+    loop.run_until_complete(main(luminance=luminance))
