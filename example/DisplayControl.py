@@ -5,14 +5,15 @@ import logging
 logging.getLogger("PIL.TiffImagePlugin").setLevel(logging.CRITICAL+1)
 import spidev as SPI
 sys.path.append("..")
+sys.path.append("/home/gix/TECHIN514/Shinmood/")
 from lib import LCD_1inch28
 from PIL import Image,ImageDraw,ImageFont, TiffImagePlugin
 TiffImagePlugin.DEBUG=False
-Font3 = ImageFont.truetype("../Font/Font02.ttf",32)
+Font3 = ImageFont.truetype("/home/gix/TECHIN514/Shinmood/Font/Font02.ttf",32)
 
 # Reading the images into the memory
-HAPPY_PATH = '../emoji/Happy 13FTS_Per Secend'
-CRY_PATH = '../emoji/Cry 16FTS_Per Second'
+HAPPY_PATH = '/home/gix/TECHIN514/Shinmood/emoji/Happy 13FTS_Per Secend'
+CRY_PATH = '/home/gix/TECHIN514/Shinmood/emoji/Cry 16FTS_Per Second'
 LOADED_IMAGES = {
     'happy': [Image.open(os.path.join(HAPPY_PATH, f)) for f in os.listdir(HAPPY_PATH)],
     'cry': [Image.open(os.path.join(CRY_PATH, f)) for f in os.listdir(CRY_PATH)]

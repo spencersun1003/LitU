@@ -19,7 +19,7 @@ normalize = {
         'gz': 6.819778407387476,
     }
 }
-parameters = pickle.load(open('../lstm_model.pkl', 'rb'))
+parameters = pickle.load(open('/home/gix/TECHIN514/Shinmood/lstm_model.pkl', 'rb'))
 
 def sigmoid(x):
     return 1 / (1 + np.exp(-x))
