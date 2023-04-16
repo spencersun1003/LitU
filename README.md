@@ -6,8 +6,7 @@ This is a final project for hardware software lab I at UW MSTI program.
 
 A digital accessory that can record the light level you receive during the day while having the function of automatically adjusting your room light in the evening.
 
- <img src="./Demo/Overall.png" width = "300" align=center />
-![](./Demo/Overall.png =50x50)
+ <img src="./Demo/Overall.png" width = "260" align=center />
 
 ## Implementation
 
